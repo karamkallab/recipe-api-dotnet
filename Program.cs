@@ -1,6 +1,7 @@
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using RecipeApi.Data;
 using RecipeApi.Infrastructure;
@@ -40,6 +41,11 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddAuthorization();
 builder.Services.AddControllers();
 
+// CORS – allow frontend served from any origin (dev)
+builder.Services.AddCors(options =>
+    options.AddDefaultPolicy(policy =>
+        policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));
+
 // OpenAPI
 builder.Services.AddOpenApi(options =>
 {
@@ -47,7 +53,7 @@ builder.Services.AddOpenApi(options =>
     {
         document.Info.Title = "Recipe API";
         document.Info.Version = "v1";
-        document.Info.Description = "REST API for managing recipes with ingredients and instructions. Built with ASP.NET Core and Entity Framework Core.";
+        document.Info.Description = "REST API for managing recipes with ingredients and instructions.";
         return Task.CompletedTask;
     });
 
@@ -63,6 +69,15 @@ using (var scope = app.Services.CreateScope())
     await DbSeeder.SeedAsync(db);
 }
 
+// Serve frontend from /app
+app.UseFileServer(new FileServerOptions
+{
+    FileProvider = new PhysicalFileProvider(
+        Path.Combine(builder.Environment.ContentRootPath, "frontend")),
+    RequestPath = "/app",
+    EnableDefaultFiles = true
+});
+
 // OpenAPI + Scalar UI
 app.MapOpenApi();
 app.MapScalarApiReference(options =>
@@ -72,6 +87,7 @@ app.MapScalarApiReference(options =>
     options.DefaultHttpClient = new(ScalarTarget.Http, ScalarClient.Http11);
 });
 
+app.UseCors();
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
