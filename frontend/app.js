@@ -93,17 +93,24 @@ function fmtTime(prep, cook) {
   return t >= 60 ? `${Math.floor(t / 60)}h ${t % 60 ? (t % 60) + 'min' : ''}`.trim() : `${t} min`;
 }
 
-function recipeImageUrl(category = '', title = '', w = 400, h = 260) {
-  const kwMap = {
-    pasta: 'pasta,italian', curry: 'curry,indian', breakfast: 'breakfast,eggs',
-    soup: 'soup,bowl', salad: 'salad,fresh', dessert: 'cake,dessert',
-    meat: 'steak,grilled', seafood: 'fish,seafood', vegetarian: 'vegetables',
-    vegan: 'vegan,plant', pizza: 'pizza', burger: 'burger',
+function recipeImageUrl(category = '', _title = '', w = 600, h = 340) {
+  // Static Unsplash photo IDs per category – always load instantly
+  const photos = {
+    breakfast:   'photo-1533089860892-a7c6f0a88666',
+    pasta:       'photo-1621996346565-e3dbc646d9a9',
+    curry:       'photo-1565557623262-b51c2513a641',
+    soup:        'photo-1547592166-23ac45744acd',
+    salad:       'photo-1512621776951-a57141f2eefd',
+    dessert:     'photo-1563729784474-d77dbb933a9e',
+    meat:        'photo-1558030006-450675393462',
+    seafood:     'photo-1559742811-822873691df8',
+    vegetarian:  'photo-1540420773420-3366772f4999',
+    vegan:       'photo-1498837167922-ddd27525d352',
+    pizza:       'photo-1513104890138-7c749659a591',
+    burger:      'photo-1568901346375-23c9450c58cd',
   };
-  const kw = kwMap[category.toLowerCase()]
-    || encodeURIComponent(title.split(/\s+/).slice(0, 2).join(','))
-    || 'food';
-  return `https://source.unsplash.com/${w}x${h}/?food,${kw}`;
+  const id = photos[category.toLowerCase()] || 'photo-1546069901-ba9599a7e63c';
+  return `https://images.unsplash.com/${id}?w=${w}&h=${h}&fit=crop&auto=format`;
 }
 
 function loading(el) {
