@@ -93,6 +93,19 @@ function fmtTime(prep, cook) {
   return t >= 60 ? `${Math.floor(t / 60)}h ${t % 60 ? (t % 60) + 'min' : ''}`.trim() : `${t} min`;
 }
 
+function recipeImageUrl(category = '', title = '', w = 400, h = 260) {
+  const kwMap = {
+    pasta: 'pasta,italian', curry: 'curry,indian', breakfast: 'breakfast,eggs',
+    soup: 'soup,bowl', salad: 'salad,fresh', dessert: 'cake,dessert',
+    meat: 'steak,grilled', seafood: 'fish,seafood', vegetarian: 'vegetables',
+    vegan: 'vegan,plant', pizza: 'pizza', burger: 'burger',
+  };
+  const kw = kwMap[category.toLowerCase()]
+    || encodeURIComponent(title.split(/\s+/).slice(0, 2).join(','))
+    || 'food';
+  return `https://source.unsplash.com/${w}x${h}/?food,${kw}`;
+}
+
 function loading(el) {
   el.innerHTML = `<div class="loader"><div class="spinner"></div><p>Laddar…</p></div>`;
 }
@@ -113,6 +126,23 @@ async function viewRecipes(main, myOnly = false) {
 function renderRecipeList(main, recipes, myOnly) {
   const heading = myOnly ? 'Mina recept' : 'Alla recept';
   main.innerHTML = `
+    ${!myOnly ? `
+    <section class="hero">
+      <div class="hero-inner">
+        <p class="hero-tag">Ditt digitala receptkök</p>
+        <h1 class="hero-title">Hitta inspiration<br>till nästa måltid</h1>
+        <p class="hero-sub">Bläddra bland hundratals recept, skapa egna och dela med vänner.</p>
+        <div class="hero-actions">
+          ${state.user
+            ? `<a href="#new" class="btn btn--primary btn--lg">+ Skapa recept</a>`
+            : `<a href="#auth" class="btn btn--primary btn--lg">Kom igång gratis</a>`}
+          <button class="btn btn--white btn--lg" onclick="document.getElementById('grid').scrollIntoView({behavior:'smooth'})">
+            Utforska recept ↓
+          </button>
+        </div>
+      </div>
+    </section>
+    ` : ''}
     <div class="page-header">
       <h1>${heading}</h1>
       ${!myOnly ? `
@@ -138,19 +168,28 @@ function renderRecipeList(main, recipes, myOnly) {
 }
 
 function cardHTML(r, showOwnerActions = false) {
+  const imgSrc = recipeImageUrl(r.category, r.title, 600, 340);
   return `
     <article class="card" onclick="go('recipe/${r.id}')">
-      <div class="card-hero">${categoryEmoji(r.category)}</div>
+      <div class="card-img-wrap">
+        <img class="card-img"
+             src="${imgSrc}"
+             alt="${esc(r.title)}"
+             loading="lazy"
+             onerror="this.parentElement.classList.add('card-img-err')" />
+        <span class="card-img-badge">${esc(r.category) || 'Övrigt'}</span>
+      </div>
       <div class="card-body">
         <div class="card-top">
-          <span class="badge">${esc(r.category) || 'Övrigt'}</span>
-          <span class="card-author">av ${esc(r.author)}</span>
+          <h2 class="card-title">${esc(r.title)}</h2>
         </div>
-        <h2 class="card-title">${esc(r.title)}</h2>
         <p class="card-desc">${esc(r.description)}</p>
-        <div class="card-stats">
-          <span>⏱ ${fmtTime(r.prepTimeMinutes, r.cookTimeMinutes)}</span>
-          <span>👥 ${r.servings} port.</span>
+        <div class="card-footer">
+          <div class="card-stats">
+            <span>⏱ ${fmtTime(r.prepTimeMinutes, r.cookTimeMinutes)}</span>
+            <span>👥 ${r.servings} port.</span>
+          </div>
+          <span class="card-author">av ${esc(r.author)}</span>
         </div>
       </div>
       ${showOwnerActions ? `
@@ -183,22 +222,27 @@ async function viewDetail(main, id) {
   try {
     const r = await api.get(`/recipes/${id}`);
     const isOwner = state.user?.username === r.author;
+    const bannerSrc = recipeImageUrl(r.category, r.title, 1200, 480);
     main.innerHTML = `
       <div class="detail">
         <button class="btn btn--ghost" onclick="history.back()">← Tillbaka</button>
 
-        <div class="detail-header">
-          <div class="detail-hero">${categoryEmoji(r.category)}</div>
-          <div class="detail-info">
-            <span class="badge">${esc(r.category) || 'Övrigt'}</span>
-            <h1 class="detail-title">${esc(r.title)}</h1>
-            <p class="detail-desc">${esc(r.description)}</p>
-            <div class="detail-meta">
-              <span>⏱ Förb. ${r.prepTimeMinutes} min</span>
-              <span>🔥 Tillagn. ${r.cookTimeMinutes} min</span>
-              <span>👥 ${r.servings} portioner</span>
-              <span>👤 ${esc(r.author)}</span>
-            </div>
+        <div class="detail-banner-wrap">
+          <img class="detail-banner"
+               src="${bannerSrc}"
+               alt="${esc(r.title)}"
+               onerror="this.parentElement.classList.add('banner-err')" />
+          <span class="detail-banner-badge">${esc(r.category) || 'Övrigt'}</span>
+        </div>
+
+        <div class="detail-info">
+          <h1 class="detail-title">${esc(r.title)}</h1>
+          <p class="detail-desc">${esc(r.description)}</p>
+          <div class="detail-meta">
+            <span>⏱ Förb. ${r.prepTimeMinutes} min</span>
+            <span>🔥 Tillagn. ${r.cookTimeMinutes} min</span>
+            <span>👥 ${r.servings} portioner</span>
+            <span>👤 ${esc(r.author)}</span>
           </div>
         </div>
 
