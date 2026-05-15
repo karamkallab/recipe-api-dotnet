@@ -1,0 +1,49 @@
+## .NET / C#
+
+# Build output
+bin/
+obj/
+
+# Database files (SQLite)
+*.db
+*.db-shm
+*.db-wal
+
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.userprefs
+
+# Visual Studio / Rider
+.vs/
+.idea/
+*.DotSettings.user
+
+# VS Code
+.vscode/
+
+# NuGet
+*.nupkg
+*.snupkg
+.nuget/
+packages/
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# User secrets / environment overrides
+appsettings.Local.json
+appsettings.*.Local.json
+secrets.json
+
+# Publish output
+publish/
+PublishProfiles/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
