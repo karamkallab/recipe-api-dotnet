@@ -1,68 +1,96 @@
-# Recipe API
+# 🍽️ RecipeBook
 
-A production-ready REST API for managing recipes with ingredients and step-by-step instructions. Built with ASP.NET Core 10, Entity Framework Core, and SQLite.
+A full-stack recipe management app with a REST API backend and a vanilla JS frontend. Users can browse recipes, create accounts, and manage their own recipes with full CRUD support.
 
-## Features
-
-- **JWT Authentication** — register and login to get a signed token
-- **Full CRUD for recipes** — create, read, update, and delete
-- **Ownership enforcement** — users can only edit or delete their own recipes
-- **Filtering** — search recipes by keyword or category
-- **Seed data** — demo account with three example recipes on first run
-- **Scalar API UI** — interactive documentation at `/scalar`
-
-## Tech Stack
-
-| Layer | Technology |
-|---|---|
-| Framework | ASP.NET Core 10 |
-| ORM | Entity Framework Core 10 |
-| Database | SQLite |
-| Auth | JWT Bearer (HMAC-SHA512) |
-| Password hashing | BCrypt.Net-Next |
-| API docs | Scalar + Microsoft.AspNetCore.OpenApi |
+[![.NET](https://img.shields.io/badge/.NET-10.0-512BD4?logo=dotnet)](https://dotnet.microsoft.com/)
+[![EF Core](https://img.shields.io/badge/EF_Core-10.0-512BD4)](https://learn.microsoft.com/en-us/ef/core/)
+[![SQLite](https://img.shields.io/badge/SQLite-embedded-003B57?logo=sqlite)](https://www.sqlite.org/)
+[![JWT](https://img.shields.io/badge/Auth-JWT-000000?logo=jsonwebtokens)](https://jwt.io/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 ---
 
-## Getting Started
+## 📸 Screenshots
+
+> _Screenshot placeholder — add your own image here._
+
+```
+[ Home page with recipe grid and hero section ]
+[ Recipe detail page with ingredients & instructions ]
+[ Create / edit recipe form ]
+```
+
+**Live demo:** _[Deploy to Azure / Railway / Render and add link here]_
+
+---
+
+## ✨ Features
+
+- **JWT authentication** — register and login, token stored in localStorage
+- **Full CRUD for recipes** — create, read, update, and delete
+- **Ownership enforcement** — only the author can edit or delete a recipe
+- **Search & filter** — by keyword and/or category
+- **Vanilla JS SPA** — no framework, hash-based routing, served by the API itself
+- **Auto seed data** — demo user and three example recipes on first run
+- **Interactive API docs** — Scalar UI at `/scalar`
+
+---
+
+## 🛠️ Tech Stack
+
+| Layer | Technology |
+|---|---|
+| **Backend framework** | ASP.NET Core 10 |
+| **ORM** | Entity Framework Core 10 |
+| **Database** | SQLite (file-based, zero config) |
+| **Authentication** | JWT Bearer — HMAC-SHA512 |
+| **Password hashing** | BCrypt.Net-Next |
+| **API documentation** | Scalar + Microsoft.AspNetCore.OpenApi |
+| **Frontend** | Vanilla HTML, CSS, JavaScript (no framework) |
+| **Images** | Unsplash (static photo IDs per category) |
+
+---
+
+## 🚀 Getting Started
 
 ### Prerequisites
 
 - [.NET 10 SDK](https://dotnet.microsoft.com/download)
 
-### 1. Clone the repository
+### 1. Clone
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/recipe-api.git
-cd recipe-api/RecipeApi
+git clone https://github.com/karamkallab/recipe-api-dotnet.git
+cd recipe-api-dotnet
 ```
 
-### 2. Configure the JWT secret
+### 2. Configure JWT secret
 
-Open `appsettings.json` and replace the secret with a strong value (min 64 chars):
+Open `appsettings.json` and replace the placeholder with a strong secret (minimum 64 characters):
 
 ```json
 "Jwt": {
-  "Secret": "your-own-super-secret-key-min-64-characters-long-replace-this-now"
+  "Secret": "replace-this-with-a-long-random-string-at-least-64-characters"
 }
 ```
 
-> For production use environment variables or .NET User Secrets instead.
+> **Production tip:** use environment variables or `dotnet user-secrets` instead of editing `appsettings.json`.
 
-### 3. Run the application
+### 3. Run
 
 ```bash
 dotnet run
 ```
 
-The database and seed data are created automatically on startup.
+The database is created and seeded automatically on first startup.
 
-| URL | Description |
+| URL | What you get |
 |---|---|
-| `http://localhost:5000/scalar` | Interactive API documentation |
-| `http://localhost:5000/openapi/v1.json` | Raw OpenAPI JSON |
+| `http://localhost:5022/app` | Frontend (recipe browser) |
+| `http://localhost:5022/scalar` | Interactive API documentation |
+| `http://localhost:5022/openapi/v1.json` | Raw OpenAPI JSON |
 
-### Demo credentials (seed data)
+### Demo account (seed data)
 
 ```
 Email:    demo@recipeapi.com
@@ -71,16 +99,19 @@ Password: Demo1234!
 
 ---
 
-## API Endpoints
+## 📡 API Reference
 
 ### Authentication
 
-| Method | Path | Auth | Description |
-|--------|------|------|-------------|
-| `POST` | `/api/auth/register` | ❌ | Create a new account |
-| `POST` | `/api/auth/login` | ❌ | Login and receive a JWT |
+| Method | Endpoint | Auth | Description |
+|--------|----------|:----:|-------------|
+| `POST` | `/api/auth/register` | — | Create a new user account |
+| `POST` | `/api/auth/login` | — | Login and receive a JWT |
 
-**Register body:**
+<details>
+<summary>Request / response examples</summary>
+
+**POST /api/auth/register**
 ```json
 {
   "username": "alice",
@@ -89,7 +120,7 @@ Password: Demo1234!
 }
 ```
 
-**Login body:**
+**POST /api/auth/login**
 ```json
 {
   "email": "alice@example.com",
@@ -107,62 +138,64 @@ Password: Demo1234!
 }
 ```
 
-Add the token to all authenticated requests:
+Use the token in every authenticated request:
 ```
 Authorization: Bearer eyJhbGci...
 ```
+</details>
 
 ---
 
 ### Recipes
 
-| Method | Path | Auth | Description |
-|--------|------|------|-------------|
-| `GET` | `/api/recipes` | ❌ | List all recipes (supports `?category=` and `?search=`) |
-| `GET` | `/api/recipes/{id}` | ❌ | Get a single recipe with full details |
-| `GET` | `/api/recipes/my` | ✅ | Get recipes belonging to the logged-in user |
-| `POST` | `/api/recipes` | ✅ | Create a new recipe |
+| Method | Endpoint | Auth | Description |
+|--------|----------|:----:|-------------|
+| `GET` | `/api/recipes` | — | List all recipes |
+| `GET` | `/api/recipes?search=pasta` | — | Search by keyword |
+| `GET` | `/api/recipes?category=Curry` | — | Filter by category |
+| `GET` | `/api/recipes/{id}` | — | Get one recipe (full details) |
+| `GET` | `/api/recipes/my` | ✅ | Get the current user's recipes |
+| `POST` | `/api/recipes` | ✅ | Create a recipe |
 | `PUT` | `/api/recipes/{id}` | ✅ | Update a recipe (owner only) |
 | `DELETE` | `/api/recipes/{id}` | ✅ | Delete a recipe (owner only) |
 
-**Create recipe body:**
+<details>
+<summary>Request / response examples</summary>
+
+**POST /api/recipes — create**
 ```json
 {
   "title": "Pasta Carbonara",
-  "description": "Classic Roman pasta dish.",
+  "description": "Classic Roman pasta dish with eggs and pancetta.",
   "prepTimeMinutes": 10,
   "cookTimeMinutes": 20,
   "servings": 4,
   "category": "Pasta",
   "ingredients": [
     { "name": "Spaghetti", "amount": "400", "unit": "g" },
-    { "name": "Eggs", "amount": "4", "unit": "pcs" }
+    { "name": "Eggs",      "amount": "4",   "unit": "pcs" },
+    { "name": "Pancetta",  "amount": "150", "unit": "g" }
   ],
   "instructions": [
-    { "stepNumber": 1, "description": "Boil pasta in salted water." },
-    { "stepNumber": 2, "description": "Fry pancetta until crispy." }
+    { "stepNumber": 1, "description": "Boil pasta in salted water until al dente." },
+    { "stepNumber": 2, "description": "Fry pancetta until crispy, remove from heat." },
+    { "stepNumber": 3, "description": "Mix eggs with cheese, combine with pasta off heat." }
   ]
 }
 ```
 
-**Update recipe body** (all fields optional):
+**PUT /api/recipes/{id} — partial update** (all fields optional)
 ```json
 {
-  "title": "Updated Title",
+  "title": "Spaghetti Carbonara",
   "servings": 6
 }
 ```
-
-**Query parameters for `GET /api/recipes`:**
-
-| Parameter | Example | Description |
-|-----------|---------|-------------|
-| `category` | `?category=Pasta` | Filter by category (case-insensitive) |
-| `search` | `?search=chicken` | Full-text search on title and description |
+</details>
 
 ---
 
-## HTTP Status Codes
+### HTTP Status Codes
 
 | Code | Meaning |
 |------|---------|
@@ -170,39 +203,68 @@ Authorization: Bearer eyJhbGci...
 | `201 Created` | Resource created |
 | `204 No Content` | Successful delete |
 | `400 Bad Request` | Validation error |
-| `401 Unauthorized` | Missing or invalid JWT |
-| `403 Forbidden` | Authenticated but not the owner |
+| `401 Unauthorized` | Missing or invalid JWT token |
+| `403 Forbidden` | Authenticated but not the resource owner |
 | `404 Not Found` | Resource does not exist |
-| `409 Conflict` | Email or username already taken |
+| `409 Conflict` | Email or username already in use |
 
 ---
 
-## Project Structure
+## 🗂️ Project Structure
 
 ```
 RecipeApi/
-├── Controllers/          # HTTP endpoints
-│   ├── AuthController.cs
-│   └── RecipesController.cs
+├── Controllers/
+│   ├── AuthController.cs        # POST /api/auth/register & login
+│   └── RecipesController.cs     # CRUD /api/recipes
+│
 ├── Data/
-│   ├── AppDbContext.cs   # EF Core context
-│   ├── DbSeeder.cs       # Seed data
-│   └── Migrations/       # EF Core migrations
-├── DTOs/                 # Request/response shapes
+│   ├── AppDbContext.cs           # EF Core DbContext
+│   ├── DbSeeder.cs               # Seed data (demo user + 3 recipes)
+│   └── Migrations/               # EF Core migration files
+│
+├── DTOs/                         # Request & response shapes
+│   ├── RegisterDto.cs
+│   ├── LoginDto.cs
+│   ├── AuthResponseDto.cs
+│   ├── RecipeDto.cs              # Create, Update, Summary, full
+│   ├── IngredientDto.cs
+│   └── InstructionDto.cs
+│
 ├── Infrastructure/
-│   └── BearerSecuritySchemeTransformer.cs
-├── Models/               # Database entities
+│   └── BearerSecuritySchemeTransformer.cs  # Adds JWT to OpenAPI docs
+│
+├── Models/                       # EF Core entities
 │   ├── User.cs
 │   ├── Recipe.cs
 │   ├── Ingredient.cs
 │   └── Instruction.cs
-├── Services/             # Business logic
-│   ├── ITokenService.cs / TokenService.cs
-│   └── IRecipeService.cs / RecipeService.cs
+│
+├── Services/
+│   ├── ITokenService.cs / TokenService.cs   # JWT creation
+│   └── IRecipeService.cs / RecipeService.cs # Business logic
+│
+├── frontend/                     # Vanilla JS SPA (served at /app)
+│   ├── index.html
+│   ├── style.css
+│   └── app.js
+│
 ├── appsettings.json
-└── Program.cs
+├── appsettings.Development.json
+└── Program.cs                    # App bootstrap, DI, middleware pipeline
 ```
 
-## License
+---
 
-MIT
+## 🔒 Security Notes
+
+- Passwords are hashed with BCrypt (cost factor 11) — never stored in plaintext
+- JWTs are signed with HMAC-SHA512 and expire after 24 hours
+- Authorization checks are enforced server-side; the frontend only hides UI elements
+- **Change the JWT secret before deploying** — the default value in `appsettings.json` is a placeholder
+
+---
+
+## 📄 License
+
+[MIT](LICENSE) © 2026 — feel free to use this project as a starting point.

@@ -1,49 +1,89 @@
-## .NET / C#
+# ──────────────────────────────────────────────────
+#  .gitignore – C# / .NET  +  Node.js / frontend
+# ──────────────────────────────────────────────────
 
-# Build output
-bin/
-obj/
+# ── .NET build output ──────────────────────────────
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+artifacts/
 
-# Database files (SQLite)
+# ── SQLite database files ──────────────────────────
 *.db
 *.db-shm
 *.db-wal
 
-# User-specific files
+# ── .NET user / IDE files ──────────────────────────
 *.rsuser
 *.suo
 *.user
 *.userosscache
 *.sln.docstates
 *.userprefs
-
-# Visual Studio / Rider
 .vs/
 .idea/
 *.DotSettings.user
+*.DS_Store
 
-# VS Code
+# ── VS Code ────────────────────────────────────────
 .vscode/
+!.vscode/extensions.json
+!.vscode/settings.json.example
 
-# NuGet
+# ── NuGet ──────────────────────────────────────────
 *.nupkg
 *.snupkg
 .nuget/
 packages/
 project.lock.json
 project.fragment.lock.json
-artifacts/
 
-# User secrets / environment overrides
-appsettings.Local.json
-appsettings.*.Local.json
-secrets.json
-
-# Publish output
+# ── Publish / deploy ───────────────────────────────
 publish/
 PublishProfiles/
 
-# OS
+# ── Secrets / local config ─────────────────────────
+appsettings.Local.json
+appsettings.*.Local.json
+secrets.json
+.env
+.env.local
+.env.*.local
+
+# ── Node.js ────────────────────────────────────────
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.npm
+.pnp
+.pnp.js
+.yarn/
+
+# ── Frontend build output ──────────────────────────
+dist/
+build/
+.next/
+.nuxt/
+.output/
+out/
+
+# ── Package manager locks (keep only the one you use) ──
+# Uncomment to ignore lock files:
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
+
+# ── Testing ────────────────────────────────────────
+coverage/
+*.lcov
+.nyc_output/
+TestResults/
+
+# ── OS ─────────────────────────────────────────────
 .DS_Store
 Thumbs.db
 desktop.ini
+ehthumbs.db
